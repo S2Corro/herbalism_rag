@@ -8,8 +8,8 @@ agents: [all]
 tags: [documentation, standards, naming, frontmatter, templates, governance]
 related: []
 created: 2026-03-04
-updated: 2026-03-13
-version: 2.1.0
+updated: 2026-03-31
+version: 2.2.0
 ---
 
 > **BLUF:** NASA/JPL-grade documentation standard for all projects. All docs must use YAML frontmatter, BLUF-first writing, and follow the Indexed Decimal folder structure. Enforces change control (NPR 7150.2D), peer review gates, requirements traceability (DO-178C §6.4), and formal retention/archival policies. Documentation is a first-class deliverable — not an afterthought.
@@ -403,6 +403,20 @@ When generating or editing documentation in this system:
 8. **Follow change control** — bump version, descriptive commit message (§8)
 9. **Flag for review** — new Governance docs require independent review (§9)
 10. **Maintain traceability** — populate `related` field bidirectionally (§10)
+11. **Referential integrity** — every document ID referenced in prose must resolve to a file that exists in the CODEX (§12.1)
+
+### 12.1 Referential Integrity — Mandatory
+
+> **If you name it, it must exist.** Every CODEX document ID (DEF-NNN, EVO-NNN, BLU-NNN, SPR-NNN, etc.) referenced in any document — whether in prose, tables, audit reports, or sprint docs — **must resolve to a file that exists in the CODEX at the time the referencing document is committed.**
+
+| Rule | Requirement |
+|:-----|:------------|
+| **Create before you cite** | If you reference `DEF-001` in an audit report, `DEF-001` must exist as a file in `50_DEFECTS/` before you commit the audit report. |
+| **No phantom references** | Do not reference future documents you intend to create later. Create the document first, then reference it. |
+| **MANIFEST sync** | Every referenced ID must also have a corresponding entry in `MANIFEST.yaml`. |
+| **Verify on commit** | Before committing any document, verify that every `XXX-NNN` pattern in the text resolves to a real file. |
+
+**Rationale:** Phantom references — citing a document that doesn't exist — create false expectations for both humans and agents. An agent reading an audit report that says "see DEF-001" and finding no such file has no way to act on it. This rule eliminates that failure mode.
 
 ---
 
@@ -422,6 +436,7 @@ Before marking any doc as APPROVED:
 - [ ] Entry added to MANIFEST.yaml
 - [ ] Entry added to README.md master index
 - [ ] `related` field populated with bidirectional cross-references (§10)
+- [ ] **All referenced document IDs resolve to existing files (§12.1)**
 - [ ] Version bumped appropriately (§8.1)
 - [ ] Peer review completed per §9
 - [ ] Change committed with descriptive message referencing doc ID
