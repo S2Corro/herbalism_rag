@@ -269,7 +269,17 @@ documents:
   # (empty — add project-specific verification docs here)
 
   # ── 50_DEFECTS ─────────────────────────────────────────────────────────────
-  # (empty — add project-specific defect reports here)
+  - id: DEF-001
+    path: 50_DEFECTS/DEF-001_Tracked_Gitkeep_In_Ignored_Dirs.md
+    title: "Tracked .gitkeep files inside gitignored directories"
+    type: reference
+    status: OPEN
+    tags: [defect, git, scaffold]
+    agents: [coder]
+    summary: >
+      data/chroma_db/.gitkeep and data/usda_duke/.gitkeep are tracked despite
+      parent dirs being in .gitignore. T-001 committed them before T-002 added
+      the gitignore. Fix: git rm --cached both files.
 
   # ── 60_EVOLUTION ───────────────────────────────────────────────────────────
   - id: EVO-001
