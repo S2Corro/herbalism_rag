@@ -2,7 +2,7 @@
 id: DEF-001
 title: "Tracked .gitkeep files inside gitignored directories"
 type: reference
-status: OPEN
+status: VERIFIED
 owner: architect
 agents: [coder]
 tags: [defect, git, scaffold]
@@ -63,8 +63,8 @@ version: 1.0.0
 
 ## 6. Verification
 
-- [ ] `git rm --cached` executed for both files
-- [ ] `git check-ignore data/chroma_db/` returns `data/chroma_db/`
-- [ ] `git check-ignore data/usda_duke/` returns `data/usda_duke/`
-- [ ] No new errors introduced
-- [ ] Architect UAT approved
+- [x] `git rm --cached` executed for both files — commit `4b612be`
+- [x] `git check-ignore data/chroma_db/` returns `data/chroma_db/`
+- [x] `git check-ignore data/usda_duke/` returns `data/usda_duke/`
+- [x] No new errors introduced
+- [x] Architect UAT approved — 2026-03-31
