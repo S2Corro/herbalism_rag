@@ -35,7 +35,7 @@ version: 1.0.0
 | **GOV-002** | Unit test for `GET /api/status` must be written alongside the route (T-006). |
 | **GOV-003** | Python: type annotations on every function signature. Max 60 lines per function. Docstrings on every public function. No `# type: ignore`. |
 | **GOV-004** | `config.py` must raise a clear, typed `ConfigurationError` on startup if `ANTHROPIC_API_KEY` is missing. No silent `None`. |
-| **GOV-005** | Branch per task: `feature/SPR-001-TNNN-description`. Commit format: `feat(SPR-001): T-NNN description`. Do NOT push to `main`. |
+| **GOV-005** | Branch per task: `feature/SPR-001-TNNN-description`. Commit format: `feat(SPR-001): T-NNN description`. Do NOT push to `master`. |
 | **GOV-006** | `main.py` startup sequence must emit one structured JSON log line: `{"event": "startup", "status": "ok", "doc_count": 0}`. Use Python `structlog` or `logging` with JSON formatter. |
 | **GOV-007** | Update task status in this sprint doc as you work. If blocked, file a `DEF-` doc and notify Architect. |
 | **GOV-008** | `.gitignore` must exclude: `.env`, `data/chroma_db/`, `data/usda_duke/`, `__pycache__/`, `*.pyc`, `.venv/`. |
@@ -232,7 +232,7 @@ version: 1.0.0
 
 ## Sprint Completion Criteria
 
-> The Architect will not close this sprint and will not approve the PR to `main` until every item below is checked.
+> The Architect will not close this sprint and will not approve the PR to `master` until every item below is checked.
 
 - [ ] All 6 tasks pass their acceptance criteria
 - [ ] `uvicorn backend.main:app --reload` starts without errors
