@@ -16,13 +16,14 @@ Run with:
 
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import AsyncGenerator, Dict
+from typing import AsyncGenerator
 
 import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
+
+from backend.api.schemas.responses import StatusResponse
 
 from backend.config import settings  # noqa: F401 — fail fast on missing key
 
@@ -92,8 +93,8 @@ app.add_middleware(
 # ---------------------------------------------------------------------------
 # API routes
 # ---------------------------------------------------------------------------
-@app.get("/api/status", response_class=JSONResponse)
-async def get_status() -> Dict[str, object]:
+@app.get("/api/status", response_model=StatusResponse)
+async def get_status() -> StatusResponse:
     """Return application health status.
 
     Returns a JSON object with the service name, version, operational
@@ -101,15 +102,14 @@ async def get_status() -> Dict[str, object]:
     ingesters are implemented in a later phase).
 
     Returns:
-        dict: ``{"status": "ok", "service": "herbalism-rag",
-        "version": "0.1.0", "doc_count": 0}``
+        StatusResponse with status, service name, version, and doc_count.
     """
-    return {
-        "status": "ok",
-        "service": _SERVICE_NAME,
-        "version": _VERSION,
-        "doc_count": 0,
-    }
+    return StatusResponse(
+        status="ok",
+        service=_SERVICE_NAME,
+        version=_VERSION,
+        doc_count=0,
+    )
 
 
 # ---------------------------------------------------------------------------
