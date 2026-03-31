@@ -260,7 +260,18 @@ documents:
   # (empty — add project-specific defect reports here)
 
   # ── 60_EVOLUTION ───────────────────────────────────────────────────────────
-  # (empty — add project-specific evolution docs here)
+  - id: EVO-001
+    path: 60_EVOLUTION/EVO-001_BLU001_Directory_Structure_Amendments.md
+    title: "Amend BLU-001 Directory Structure — Sprint 001 Implementation Deviations"
+    type: reference
+    status: DRAFT
+    tags: [architecture, blueprint-amendment, python, scaffold]
+    agents: [coder, architect]
+    summary: >
+      Proposes amendments to BLU-001 §4 to document files created during
+      SPR-001 that are not in the original blueprint: __init__.py package
+      markers (8 files), pyproject.toml (tooling config), and tests/
+      directory. All are necessary for a functioning Python project.
 
   # ── 70_RESEARCH ────────────────────────────────────────────────────────────
   - id: RES-001
