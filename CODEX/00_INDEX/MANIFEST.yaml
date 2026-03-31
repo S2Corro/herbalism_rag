@@ -118,13 +118,37 @@ documents:
     path: 05_PROJECT/SPR-002_Phase2_Domain_Repository.md
     title: "Phase 2 — Domain Model + Repository Layer"
     type: how-to
-    status: ACTIVE
+    status: COMPLETE
     tags: [project-management, sprint, domain-model, repository, chromadb]
     agents: [coder]
     summary: >
       Sprint 002 builds the data foundation. 5 tasks: HerbChunk dataclass,
       Pydantic response/request schemas, HerbRepository wrapping ChromaDB,
-      and unit tests for all modules.
+      and unit tests. COMPLETE — merged to master.
+
+  - id: SPR-003
+    path: 05_PROJECT/SPR-003_Phase3_Ingestion.md
+    title: "Phase 3 — Ingestion Services"
+    type: how-to
+    status: ACTIVE
+    tags: [project-management, sprint, ingestion, pubmed, msk, usda, who]
+    agents: [coder]
+    summary: >
+      Sprint 003 builds data ingestion. 7 tasks: text chunker, WHO seed
+      ingester, PubMed/MSK/Duke ingesters, orchestration script, and tests.
+      Parallel with SPR-004. Developer Agent A workspace: herbalism_rag_dev.
+
+  - id: SPR-004
+    path: 05_PROJECT/SPR-004_Phase4_RAG_Services.md
+    title: "Phase 4 — RAG Services"
+    type: how-to
+    status: ACTIVE
+    tags: [project-management, sprint, rag, retriever, generator, embeddings]
+    agents: [coder]
+    summary: >
+      Sprint 004 builds the RAG query pipeline. 4 tasks: RetrieverService,
+      GeneratorService, RAGPipeline orchestrator, and tests. Parallel with
+      SPR-003. Developer Agent B workspace: herbalism_rag_dev_secondary.
 
   - id: PRJ-001
     path: 05_PROJECT/PRJ-001_Herbalism_RAG_Roadmap.md
