@@ -106,13 +106,25 @@ documents:
     path: 05_PROJECT/SPR-001_Phase1_Scaffold.md
     title: "Phase 1 — Project Scaffold"
     type: how-to
-    status: ACTIVE
+    status: COMPLETE
     tags: [project-management, sprint, scaffold, fastapi, python]
     agents: [coder]
     summary: >
       Sprint 001 builds the project skeleton. 6 tasks: directory structure,
       .gitignore/.env.example, requirements.txt, config.py, main.py with
-      GET /api/status, and unit test. Developer Agent executes; Architect audits.
+      GET /api/status, and unit test. COMPLETE — merged to master.
+
+  - id: SPR-002
+    path: 05_PROJECT/SPR-002_Phase2_Domain_Repository.md
+    title: "Phase 2 — Domain Model + Repository Layer"
+    type: how-to
+    status: ACTIVE
+    tags: [project-management, sprint, domain-model, repository, chromadb]
+    agents: [coder]
+    summary: >
+      Sprint 002 builds the data foundation. 5 tasks: HerbChunk dataclass,
+      Pydantic response/request schemas, HerbRepository wrapping ChromaDB,
+      and unit tests for all modules.
 
   - id: PRJ-001
     path: 05_PROJECT/PRJ-001_Herbalism_RAG_Roadmap.md

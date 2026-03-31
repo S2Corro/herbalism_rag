@@ -6,7 +6,7 @@ status: APPROVED
 owner: architect
 agents: [all]
 created: 2026-03-31
-version: 1.0.0
+version: 1.1.0
 ---
 
 > **BLUF:** Modular monolith using Python/FastAPI with strict Controller/Service/Repository layering. One process, four clean modules. Dependencies flow downward only.
@@ -55,32 +55,40 @@ ChromaDB + sentence-transformers
 herbalism_rag/
 |
 |- backend/
+|   |- __init__.py                # Package marker
 |   |- main.py                    # FastAPI app factory, mounts routes + static
 |   |- config.py                  # Pydantic Settings, reads from .env
 |   |
 |   |- api/                       # CONTROLLER LAYER
+|   |   |- __init__.py
 |   |   |- routes/
+|   |   |   |- __init__.py
 |   |   |   |- query.py           # POST /api/query
 |   |   |   |- herbs.py           # GET /api/herbs
 |   |   |   |- status.py          # GET /api/status
 |   |   |- schemas/
+|   |       |- __init__.py
 |   |       |- requests.py        # QueryRequest
 |   |       |- responses.py       # QueryResponse, Source, StatusResponse
 |   |
 |   |- rag/                       # SERVICE LAYER — RAG domain
+|   |   |- __init__.py
 |   |   |- pipeline.py            # RAGPipeline.run(question) -> QueryResponse
 |   |   |- retriever.py           # RetrieverService.search(question) -> [HerbChunk]
 |   |   |- generator.py           # GeneratorService.synthesize(q, chunks) -> str
 |   |
 |   |- ingest/                    # SERVICE LAYER — Ingestion domain
+|   |   |- __init__.py
 |   |   |- pubmed.py              # PubMedIngestor.run(herb_list)
 |   |   |- msk_herbs.py           # MSKIngestor.run()
 |   |   |- usda_duke.py           # DukeIngestor.run(csv_path)
 |   |
 |   |- db/                        # REPOSITORY LAYER
+|   |   |- __init__.py
 |   |   |- herb_repository.py     # HerbRepository: add(), search(), list(), stats()
 |   |
 |   |- models/                    # DOMAIN MODELS — shared, no layer owns them
+|       |- __init__.py
 |       |- herb_chunk.py          # HerbChunk dataclass
 |
 |- frontend/
@@ -97,9 +105,13 @@ herbalism_rag/
 |- scripts/
 |   |- ingest.py                  # Runs all ingesters in sequence
 |
+|- tests/                         # Test suite
+|   |- test_*.py                  # Naming: test_{module}.py
+|
 |- .env.example
 |- .gitignore
 |- requirements.txt
+|- pyproject.toml                 # Project/tooling config (pytest, mypy, ruff)
 |- README.md
 ```
 
@@ -141,4 +153,5 @@ class HerbRepository:
 
 | Date | Version | Change | Author |
 |:-----|:--------|:-------|:-------|
+| 2026-03-31 | 1.1.0 | Apply EVO-001: add `__init__.py`, `tests/`, `pyproject.toml` to dir tree | Architect Agent |
 | 2026-03-31 | 1.0.0 | Initial architecture | Architect Agent |
