@@ -130,25 +130,25 @@ documents:
     path: 05_PROJECT/SPR-003_Phase3_Ingestion.md
     title: "Phase 3 — Ingestion Services"
     type: how-to
-    status: ACTIVE
+    status: COMPLETE
     tags: [project-management, sprint, ingestion, pubmed, msk, usda, who]
     agents: [coder]
     summary: >
       Sprint 003 builds data ingestion. 7 tasks: text chunker, WHO seed
       ingester, PubMed/MSK/Duke ingesters, orchestration script, and tests.
-      Parallel with SPR-004. Developer Agent A workspace: herbalism_rag_dev.
+      COMPLETE — merged to master.
 
   - id: SPR-004
     path: 05_PROJECT/SPR-004_Phase4_RAG_Services.md
     title: "Phase 4 — RAG Services"
     type: how-to
-    status: ACTIVE
+    status: COMPLETE
     tags: [project-management, sprint, rag, retriever, generator, embeddings]
     agents: [coder]
     summary: >
       Sprint 004 builds the RAG query pipeline. 4 tasks: RetrieverService,
-      GeneratorService, RAGPipeline orchestrator, and tests. Parallel with
-      SPR-003. Developer Agent B workspace: herbalism_rag_dev_secondary.
+      GeneratorService, RAGPipeline orchestrator, and tests.
+      COMPLETE — merged to master.
 
   - id: PRJ-001
     path: 05_PROJECT/PRJ-001_Herbalism_RAG_Roadmap.md
@@ -309,20 +309,30 @@ documents:
     path: 50_DEFECTS/DEF-001_Tracked_Gitkeep_In_Ignored_Dirs.md
     title: "Tracked .gitkeep files inside gitignored directories"
     type: reference
-    status: OPEN
+    status: VERIFIED
     tags: [defect, git, scaffold]
     agents: [coder]
     summary: >
-      data/chroma_db/.gitkeep and data/usda_duke/.gitkeep are tracked despite
-      parent dirs being in .gitignore. T-001 committed them before T-002 added
-      the gitignore. Fix: git rm --cached both files.
+      data/chroma_db/.gitkeep and data/usda_duke/.gitkeep were tracked despite
+      parent dirs being in .gitignore. VERIFIED — fixed and merged.
+
+  - id: DEF-002
+    path: 50_DEFECTS/DEF-002_ChromaDB_Version_Pin_Mismatch.md
+    title: "ChromaDB version pin mismatch — 0.5.23 breaks upsert"
+    type: reference
+    status: VERIFIED
+    tags: [defect, dependency, chromadb]
+    agents: [coder]
+    summary: >
+      requirements.txt pinned chromadb==0.5.23 but upsert without embeddings
+      requires 1.5.5. VERIFIED — pin upgraded, all 65 tests pass.
 
   # ── 60_EVOLUTION ───────────────────────────────────────────────────────────
   - id: EVO-001
     path: 60_EVOLUTION/EVO-001_BLU001_Directory_Structure_Amendments.md
     title: "Amend BLU-001 Directory Structure — Sprint 001 Implementation Deviations"
     type: reference
-    status: DRAFT
+    status: APPROVED
     tags: [architecture, blueprint-amendment, python, scaffold]
     agents: [coder, architect]
     summary: >
