@@ -13,7 +13,7 @@ uvicorn[standard]==0.32.1
 pydantic-settings==2.7.0
 
 # Vector store
-chromadb==0.5.23
+chromadb==1.5.5
 
 # Embeddings (local, no API cost)
 sentence-transformers==3.3.1
