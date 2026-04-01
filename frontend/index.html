@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO Meta -->
+  <title>Herbalism RAG — Evidence-Based Herb Research</title>
+  <meta name="description" content="Ask questions about herbs and receive evidence-based answers with inline citations from PubMed, MSK, USDA, and WHO — powered by a local RAG pipeline." />
+  <meta name="keywords" content="herbalism, herbal medicine, evidence-based, PubMed, RAG, AI, ashwagandha, turmeric, ginger" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Herbalism RAG Project" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Herbalism RAG — Evidence-Based Herb Research" />
+  <meta property="og:description" content="Ask questions about herbs and receive evidence-based answers with inline citations from PubMed, MSK, USDA, and WHO." />
+  <meta property="og:type" content="website" />
+
+  <!-- Favicon (leaf emoji) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>" />
+
+  <!-- Design System CSS (served as static file by FastAPI) -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- =====================================================================
+       HEADER — App title, tagline, status indicator
+       ===================================================================== -->
+  <header class="app-header" role="banner">
+    <div class="container">
+      <span class="app-header__icon" aria-hidden="true">🌿</span>
+
+      <h1 class="app-header__title">
+        Herbalism <span>RAG</span>
+      </h1>
+
+      <p class="app-header__tagline">
+        Evidence-based answers from PubMed, MSK, USDA &amp; WHO — with inline citations.
+      </p>
+
+      <!-- Live system status (populated by app.js checkStatus()) -->
+      <div id="status-indicator" class="app-header__status" role="status" aria-live="polite">
+        <span class="app-header__status-dot" aria-hidden="true"></span>
+        <span id="status-text">Connecting…</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- =====================================================================
+       MAIN CONTENT
+       ===================================================================== -->
+  <main role="main">
+    <div class="container">
+
+      <!-- =================================================================
+           SECTION: Query Input
+           ================================================================= -->
+      <section id="query-section" class="query-section" aria-label="Herb Query">
+        <form id="query-form" class="query-form" role="search" novalidate>
+          <label for="query-input" class="sr-only">Ask a question about herbs</label>
+          <input
+            type="text"
+            id="query-input"
+            class="query-input"
+            name="question"
+            placeholder="e.g. What are the evidence-based benefits of ashwagandha for stress?"
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+            aria-label="Herb research question"
+            aria-required="true"
+            maxlength="500"
+          />
+          <button
+            type="submit"
+            id="submit-btn"
+            class="btn-primary"
+            aria-label="Submit question"
+          >
+            <span id="submit-btn-text">Search</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </form>
+
+        <!-- Inline validation error -->
+        <div id="query-error" class="error-message" role="alert" aria-live="assertive">
+          <div class="error-message__title">Input required</div>
+          Please enter a question to search.
+        </div>
+      </section>
+
+      <!-- =================================================================
+           SECTION: Loading State (hidden by default)
+           ================================================================= -->
+      <section
+        id="loading-section"
+        class="loading-section"
+        aria-label="Loading"
+        aria-live="polite"
+        aria-hidden="true"
+      >
+        <div class="loading-spinner" aria-hidden="true"></div>
+        <p id="loading-text" class="loading-text">Searching knowledge base…</p>
+
+        <!-- Skeleton preview so layout doesn't jump -->
+        <div class="loading-skeleton" aria-hidden="true">
+          <div class="loading-skeleton__line"></div>
+          <div class="loading-skeleton__line"></div>
+          <div class="loading-skeleton__line"></div>
+          <div class="loading-skeleton__line"></div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           SECTION: Error Display (hidden by default)
+           ================================================================= -->
+      <section
+        id="error-section"
+        class="error-message"
+        role="alert"
+        aria-live="assertive"
+        aria-hidden="true"
+      >
+        <div id="error-title" class="error-message__title">Something went wrong</div>
+        <p id="error-detail">An unexpected error occurred. Please try again.</p>
+      </section>
+
+      <!-- =================================================================
+           SECTION: Answer (hidden by default)
+           ================================================================= -->
+      <section
+        id="answer-section"
+        class="answer-section card"
+        aria-label="Answer"
+        aria-live="polite"
+        aria-hidden="true"
+      >
+        <header class="answer-header">
+          <span class="answer-header__icon" aria-hidden="true">💡</span>
+          <h2 class="answer-header__title">Answer</h2>
+        </header>
+
+        <!-- Answer text (citations like [1] rendered as gold badges by app.js) -->
+        <div id="answer-text" class="answer" role="region" aria-label="Answer text">
+          <!-- Populated by renderAnswer() in app.js -->
+        </div>
+
+        <footer class="answer-meta">
+          <span id="answer-query-time" aria-label="Query time"></span>
+          <span id="answer-source-count" aria-label="Source count"></span>
+        </footer>
+      </section>
+
+      <!-- =================================================================
+           SECTION: Sources (hidden by default)
+           ================================================================= -->
+      <section
+        id="sources-section"
+        class="sources-section"
+        aria-label="Source documents"
+        aria-hidden="true"
+      >
+        <header class="sources-header">
+          <span aria-hidden="true">📚</span>
+          <h2 class="sources-header__title">Sources</h2>
+          <span id="sources-count" class="text-secondary" style="font-size:0.85rem;margin-left:auto;"></span>
+        </header>
+
+        <!-- Source cards inserted by renderSources() in app.js -->
+        <div id="sources-grid" class="sources-grid" role="list" aria-label="Source cards">
+        </div>
+      </section>
+
+      <!-- =================================================================
+           SECTION: Herb Index (optional — hidden by default, shown on load)
+           ================================================================= -->
+      <section
+        id="herbs-section"
+        class="herbs-section card"
+        aria-label="Available herbs"
+      >
+        <header class="sources-header">
+          <span aria-hidden="true">🌱</span>
+          <h2 class="sources-header__title">Herb Index</h2>
+          <small class="text-secondary" style="margin-left:auto;">Click to prefill query</small>
+        </header>
+
+        <!-- Herb tags inserted by loadHerbs() in app.js -->
+        <div id="herbs-grid" class="herbs-grid" role="list" aria-label="Herb tags">
+          <!-- Loading placeholder shown until JS populates -->
+          <span class="herb-tag" aria-hidden="true" style="opacity:0.4;cursor:default;">Loading herbs…</span>
+        </div>
+      </section>
+
+    </div><!-- /.container -->
+  </main>
+
+  <!-- =====================================================================
+       FOOTER — Credits, data sources note
+       ===================================================================== -->
+  <footer class="app-footer" role="contentinfo">
+    <div class="container">
+      <p class="app-footer__text">
+        Data sources: 
+        <a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">PubMed</a>,
+        <a href="https://www.mskcc.org/cancer-care/diagnosis-treatment/symptom-management/integrative-medicine/herbs" target="_blank" rel="noopener noreferrer">MSK About Herbs</a>,
+        <a href="https://www.who.int/medicines/areas/traditional/en/" target="_blank" rel="noopener noreferrer">WHO Monographs</a>,
+        <a href="https://www.ars.usda.gov/northeast-area/beltsville-md-bhnrc/beltsville-human-nutrition-research-center/methods-and-application-of-food-composition-laboratory/" target="_blank" rel="noopener noreferrer">USDA Duke</a>.
+        <br />
+        Answers are AI-synthesised from indexed research excerpts. Always consult a qualified healthcare professional.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Application JavaScript (served as static file by FastAPI) -->
+  <script src="js/app.js"></script>
+
+</body>
+</html>
