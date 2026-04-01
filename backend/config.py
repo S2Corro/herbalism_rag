@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     chroma_db_path: str = "data/chroma_db"
     collection_name: str = "herbalism"
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
-    llm_model: str = "claude-haiku-20240307"
+    llm_model: str = "claude-haiku-4-5-20251001"
     top_k: int = 8
 
     @field_validator("anthropic_api_key")
