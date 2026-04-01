@@ -3,12 +3,19 @@
 This module creates and configures the FastAPI application instance.
 It follows the app-factory pattern:
 
-1. Validates configuration on import (fails fast if ANTHROPIC_API_KEY is missing).
-2. Mounts the ``frontend/`` directory as static files at ``/``.
-3. Registers the ``/api`` router (currently just the status health-check).
-4. Adds CORS middleware (permissive for development; production tightening
-   is planned for Phase 7).
-5. Emits a structured JSON log line on startup.
+1. Validates configuration on import (fails fast if ANTHROPIC_API_KEY is
+   missing).
+2. Wires up the full service graph in the lifespan context manager:
+   - ``HerbRepository`` (ChromaDB — repository layer)
+   - ``RetrieverService`` (embeddings — service layer)
+   - ``GeneratorService`` (Anthropic Claude — service layer)
+   - ``RAGPipeline`` (orchestrator — service layer)
+   All are stored on ``app.state`` for injection into route handlers.
+3. Mounts the ``/api`` routes: ``/query``, ``/herbs``, and ``/status``.
+4. Mounts the ``frontend/`` directory as static files at ``/`` (catch-all,
+   must come LAST).
+5. Adds CORS middleware (permissive for development; Phase 7 tightens this).
+6. Emits structured JSON log lines on startup and shutdown (GOV-006).
 
 Run with:
     uvicorn backend.main:app --reload
@@ -23,13 +30,17 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from backend.api.routes import herbs as herbs_router_module
+from backend.api.routes import query as query_router_module
 from backend.api.schemas.responses import StatusResponse
-
 from backend.config import settings  # noqa: F401 — fail fast on missing key
-
+from backend.db.herb_repository import HerbRepository
+from backend.rag.generator import GeneratorService
+from backend.rag.pipeline import RAGPipeline
+from backend.rag.retriever import RetrieverService
 
 # ---------------------------------------------------------------------------
-# Structured logging setup
+# Structured logging setup (GOV-006)
 # ---------------------------------------------------------------------------
 structlog.configure(
     processors=[
@@ -53,20 +64,64 @@ _FRONTEND_DIR: Path = Path(__file__).resolve().parent.parent / "frontend"
 
 
 # ---------------------------------------------------------------------------
-# Lifespan (startup / shutdown)
+# Lifespan — startup / shutdown + dependency wiring
 # ---------------------------------------------------------------------------
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    """Handle application startup and shutdown events.
+    """Wire the service graph on startup; tear down on shutdown.
 
-    On startup, emits a structured JSON log line with service metadata
-    as required by GOV-006. On shutdown, emits a clean shutdown message.
+    Constructs the full dependency chain in one place so all routes share
+    the same singletons via ``app.state``.  This avoids per-request
+    model loading (expensive) and ChromaDB client churn.
+
+    Startup order:
+        1. ``HerbRepository`` — opens ChromaDB persistent client
+        2. ``RetrieverService`` — loads sentence-transformers model
+        3. ``GeneratorService`` — creates Anthropic async client
+        4. ``RAGPipeline`` — wires retriever + generator together
 
     Args:
         app: The FastAPI application instance.
     """
-    logger.info("startup", status="ok", service=_SERVICE_NAME, doc_count=0)
+    # 1. Repository
+    repository: HerbRepository = HerbRepository(
+        chroma_db_path=settings.chroma_db_path,
+        collection_name=settings.collection_name,
+    )
+    app.state.repository = repository
+
+    # 2. Retriever
+    retriever: RetrieverService = RetrieverService(
+        repository=repository,
+        model_name=settings.embedding_model,
+    )
+    app.state.retriever = retriever
+
+    # 3. Generator
+    generator: GeneratorService = GeneratorService(
+        api_key=settings.anthropic_api_key,
+        model=settings.llm_model,
+    )
+    app.state.generator = generator
+
+    # 4. Pipeline
+    pipeline: RAGPipeline = RAGPipeline(
+        retriever=retriever,
+        generator=generator,
+    )
+    app.state.pipeline = pipeline
+
+    doc_count: int = repository.collection.count()
+    logger.info(
+        "startup",
+        status="ok",
+        service=_SERVICE_NAME,
+        version=_VERSION,
+        doc_count=doc_count,
+    )
+
     yield
+
     logger.info("shutdown", status="ok", service=_SERVICE_NAME)
 
 
@@ -93,22 +148,37 @@ app.add_middleware(
 # ---------------------------------------------------------------------------
 # API routes
 # ---------------------------------------------------------------------------
-@app.get("/api/status", response_model=StatusResponse)
-async def get_status() -> StatusResponse:
-    """Return application health status.
+app.include_router(query_router_module.router, prefix="/api", tags=["query"])
+app.include_router(herbs_router_module.router, prefix="/api", tags=["herbs"])
 
-    Returns a JSON object with the service name, version, operational
-    status, and the current document count in the vector store (0 until
-    ingesters are implemented in a later phase).
+
+from fastapi import Request  # noqa: E402 — import after router includes
+
+
+@app.get("/api/status", response_model=StatusResponse, tags=["status"])
+async def get_status(request: Request) -> StatusResponse:
+    """Return application health status with real ChromaDB doc count.
+
+    Reads the live document count from the shared ``HerbRepository`` stored
+    in ``app.state``.  Returns 0 if the collection is empty (e.g. knowledge
+    base not yet populated).
+
+    Args:
+        request: FastAPI ``Request`` used to access ``app.state.repository``.
 
     Returns:
-        StatusResponse with status, service name, version, and doc_count.
+        ``StatusResponse`` with status, service name, version, and doc_count.
     """
+    try:
+        doc_count: int = request.app.state.repository.collection.count()
+    except Exception:
+        doc_count = 0
+
     return StatusResponse(
         status="ok",
         service=_SERVICE_NAME,
         version=_VERSION,
-        doc_count=0,
+        doc_count=doc_count,
     )
 
 
