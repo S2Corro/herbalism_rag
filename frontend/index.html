@@ -16,6 +16,10 @@
   <meta property="og:description" content="Ask questions about herbs and receive evidence-based answers with inline citations from PubMed, MSK, USDA, and WHO." />
   <meta property="og:type" content="website" />
 
+  <!-- Mobile browser chrome colour -->
+  <meta name="theme-color" content="#0a0f0d" />
+  <meta name="color-scheme" content="dark" />
+
   <!-- Favicon (leaf emoji) -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>" />
 
@@ -23,6 +27,13 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+
+  <!-- No-JS fallback -->
+  <noscript>
+    <div style="padding:2rem;text-align:center;color:#e2e8f0;background:#0a0f0d;font-family:sans-serif;">
+      🌿 Herbalism RAG requires JavaScript to be enabled in your browser.
+    </div>
+  </noscript>
 
   <!-- =====================================================================
        HEADER — App title, tagline, status indicator

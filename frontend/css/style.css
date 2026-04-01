@@ -120,6 +120,30 @@ body {
   overflow-x: hidden;
 }
 
+/* Text selection highlight */
+::selection {
+  background: rgba(74, 222, 128, 0.25);
+  color: var(--text-heading);
+}
+
+/* Custom scrollbar (Webkit) */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(74, 222, 128, 0.3);
+}
+
 /* Background texture — subtle radial gradient for depth */
 body::before {
   content: '';
@@ -280,6 +304,7 @@ section + section {
   display: block;
   filter: drop-shadow(0 0 12px var(--glow-green));
   animation: float 6s ease-in-out infinite;
+  will-change: transform;
 }
 
 .app-header__title {
@@ -400,6 +425,7 @@ section + section {
   white-space: nowrap;
   position: relative;
   overflow: hidden;
+  will-change: transform;
 }
 
 /* Shimmer overlay */
@@ -484,6 +510,7 @@ section + section {
     0 4px 24px var(--shadow),
     inset 0 1px 0 rgba(255, 255, 255, 0.03);
   transition: var(--transition-base);
+  will-change: transform;
 }
 
 .card:hover {

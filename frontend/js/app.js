@@ -1,6 +1,7 @@
 /**
  * Herbalism RAG — Application Logic
  * SPR-006 T-003: Vanilla JavaScript SPA
+ * SPR-006 T-004: Polish pass
  *
  * Communicates with the FastAPI backend via:
  *   POST /api/query  → QueryResponse (BLU-002 §5)
@@ -121,11 +122,16 @@ async function fetchStatus() {
  * ============================================================ */
 
 /**
- * Shows the loading spinner and hides answer/error/sources.
+ * Resets all result areas (answer, sources, error) so a fresh
+ * query never shows stale content. Call before showLoading().
  */
-function showLoading() {
-  DOM.loadingSection.classList.add('visible');
-  DOM.loadingSection.setAttribute('aria-hidden', 'false');
+function resetResultsState() {
+  // Clear previous answer + sources content
+  DOM.answerText.innerHTML = '';
+  DOM.answerQueryTime.textContent = '';
+  DOM.answerSourceCount.textContent = '';
+  DOM.sourcesGrid.innerHTML = '';
+  DOM.sourcesCount.textContent = '';
 
   DOM.answerSection.classList.remove('visible');
   DOM.answerSection.setAttribute('aria-hidden', 'true');
@@ -137,6 +143,22 @@ function showLoading() {
   DOM.errorSection.setAttribute('aria-hidden', 'true');
 
   DOM.queryError.classList.remove('visible');
+}
+
+/**
+ * Shows the loading spinner and hides answer/error/sources.
+ * Resets the loading message text to the initial string.
+ */
+function showLoading() {
+  // Reset loading message so it's fresh on repeated queries
+  if (DOM.loadingText) {
+    DOM.loadingText.textContent = 'Searching knowledge base…';
+  }
+
+  DOM.loadingSection.classList.add('visible');
+  DOM.loadingSection.setAttribute('aria-hidden', 'false');
+
+  resetResultsState();
 }
 
 /**
@@ -669,3 +691,48 @@ async function init() {
 
 // Kick off — DOM is already ready since this script loads at end of body
 init();
+
+
+/* ============================================================
+ * DEV HELPER — Mock Response (T-004 verification)
+ *
+ * Uncomment the block below and open index.html to verify
+ * rendering works correctly without a live backend.
+ * Remove or re-comment before merging to master.
+ * ============================================================ */
+
+/*
+const MOCK_RESPONSE = {
+  "answer": "Ashwagandha (Withania somnifera) has substantial evidence supporting its adaptogenic and stress-reducing effects [1]. Clinical trials demonstrate significant reductions in serum cortisol and self-reported stress scores with standardised root extract [2]. It also exhibits anxiolytic properties comparable to lorazepam in some animal models [1]. For cognitive function, preliminary human trials suggest improvements in memory, processing speed, and executive function [3]. Herb-drug interactions are generally mild, though caution is advised in thyroid conditions [2].",
+  "sources": [
+    {
+      "source_type": "PubMed",
+      "title": "Adaptogenic and Anxiolytic Effects of Ashwagandha Root Extract",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/23439798/",
+      "year": "2012",
+      "excerpt": "Ashwagandha significantly reduced serum cortisol levels in stressed subjects (p<0.001) and improved overall well-being scores compared to placebo."
+    },
+    {
+      "source_type": "MSK",
+      "title": "About Herbs: Ashwagandha (Withania somnifera)",
+      "url": "https://www.mskcc.org/cancer-care/integrative-medicine/herbs/ashwagandha",
+      "year": "2023",
+      "excerpt": "Ashwagandha is used to relieve stress, improve concentration, and reduce fatigue. Standardised extract reduces cortisol. Thyroid patients should use with caution."
+    },
+    {
+      "source_type": "WHO",
+      "title": "WHO Monograph: Radix Withaniae",
+      "url": "https://www.who.int/medicines/publications/pharmacopoeia/en/",
+      "year": "2009",
+      "excerpt": "Radix Withaniae is used extensively in Ayurvedic medicine as a rasayana (rejuvenating tonic). Evidence supports anti-stress, immunomodulatory, and nootropic effects."
+    }
+  ],
+  "query_time_ms": 1342
+};
+
+// T-004 mock render: fires once on page load to verify layout
+// window.addEventListener('load', () => {
+//   renderAnswer(MOCK_RESPONSE);
+//   renderSources(MOCK_RESPONSE.sources);
+// });
+*/
