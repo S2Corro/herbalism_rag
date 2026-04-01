@@ -182,8 +182,21 @@ documents:
     tags: [project-management, roadmap, governance]
     agents: [all]
     summary: >
-      7-phase project roadmap for the Herbalism RAG system. Covers scope,
-      guiding principles, phase exit criteria, and success definition.
+      7-phase project roadmap for the Herbalism RAG system. v2: updated with
+      actual delivery dates, test counts, and defect references. Phases 1-4
+      complete, 5-6 active, 7 pending.
+
+  - id: PRJ-002
+    path: 05_PROJECT/PRJ-002_Operational_Context.md
+    title: "Herbalism RAG — Operational Context & Institutional Knowledge"
+    type: explanation
+    status: APPROVED
+    tags: [project-management, context, operations, institutional-knowledge]
+    agents: [all]
+    summary: >
+      State-of-the-world document for session continuity. Captures architecture
+      decisions, known gotchas, dependency state, codebase map, workspace
+      topology, and what comes next. READ THIS FIRST in a new session.
 
   # ── 10_GOVERNANCE ───────────────────────────────────────────────────────────
   - id: GOV-001
@@ -324,6 +337,18 @@ documents:
       Install, configure, and recover the DarkGravity multi-agent swarm engine.
       Covers fresh install, auto-discovery via resolve_darkgravity.sh,
       API key setup, troubleshooting, and nuclear recovery.
+
+  - id: RUN-002
+    path: 30_RUNBOOKS/RUN-002_Multi_Workspace_Operations.md
+    title: "Multi-Workspace Developer Agent Operations"
+    type: how-to
+    status: APPROVED
+    tags: [runbook, workflow, multi-agent, workspaces, parallel]
+    agents: [architect, coder]
+    summary: >
+      Covers the 3-workspace topology, sprint assignment flow, parallel
+      execution rules, architect audit workflow, venv management, and
+      defect filing. Essential reading for operating this project.
 
   # ── 40_VERIFICATION ────────────────────────────────────────────────────────
   # (empty — add project-specific verification docs here)
