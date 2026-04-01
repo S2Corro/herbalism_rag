@@ -154,25 +154,25 @@ documents:
     path: 05_PROJECT/SPR-005_Phase5_API_Controllers.md
     title: "Phase 5 — API Controllers"
     type: how-to
-    status: ACTIVE
+    status: COMPLETE
     tags: [project-management, sprint, api, controllers, routes, fastapi]
     agents: [coder]
     summary: >
       Sprint 005 wires RAG pipeline to HTTP endpoints. 4 tasks: POST /api/query,
       GET /api/herbs, route mounting + lifespan, and integration tests.
-      Parallel with SPR-006. Developer Agent A workspace: herbalism_rag_dev.
+      COMPLETE — 27 new tests (92 total), merged to master.
 
   - id: SPR-006
     path: 05_PROJECT/SPR-006_Phase6_Frontend.md
     title: "Phase 6 — Frontend"
     type: how-to
-    status: ACTIVE
+    status: COMPLETE
     tags: [project-management, sprint, frontend, html, css, javascript, ui]
     agents: [coder]
     summary: >
       Sprint 006 builds the dark botanical-themed frontend SPA. 4 tasks: CSS
       design system, HTML structure, JS application logic, polish.
-      Parallel with SPR-005. Developer Agent B workspace: herbalism_rag_dev_secondary.
+      COMPLETE — 2,209 LOC (HTML + CSS + JS), merged to master.
 
   - id: PRJ-001
     path: 05_PROJECT/PRJ-001_Herbalism_RAG_Roadmap.md
