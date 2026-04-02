@@ -376,6 +376,18 @@ documents:
       requirements.txt pinned chromadb==0.5.23 but upsert without embeddings
       requires 1.5.5. VERIFIED — pin upgraded, all 65 tests pass.
 
+  - id: DEF-003
+    path: 50_DEFECTS/DEF-003_Ingest_Duplicate_PubMed_Chunk_IDs.md
+    title: "Ingestion pipeline crashes with ChromaDB DuplicateIDError on repeated PubMed PMIDs"
+    type: reference
+    status: OPEN
+    tags: [defect, ingestion, pubmed, chromadb]
+    agents: [coder]
+    summary: >
+      scripts/ingest.py crashes with DuplicateIDError because the same PubMed
+      article appears in multiple herb searches, producing identical chunk IDs
+      in a single upsert batch. Fix patch applied; needs unit test and verification.
+
   # ── 60_EVOLUTION ───────────────────────────────────────────────────────────
   - id: EVO-001
     path: 60_EVOLUTION/EVO-001_BLU001_Directory_Structure_Amendments.md

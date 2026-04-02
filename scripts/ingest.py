@@ -118,13 +118,23 @@ def main() -> None:
     except Exception as exc:
         logger.error("ingest_duke_failed", error=str(exc))
 
+    # Deduplicate by chunk ID — the same PMID can surface for multiple herbs,
+    # which produces identical IDs in a single batch and causes ChromaDB's
+    # DuplicateIDError.  Dict preserves insertion order (Python 3.7+).
+    unique_chunks: list[HerbChunk] = list(
+        {chunk.id: chunk for chunk in all_chunks}.values()
+    )
+    duplicate_count: int = len(all_chunks) - len(unique_chunks)
+    if duplicate_count:
+        logger.warning("ingest_duplicates_removed", count=duplicate_count)
+
     # Store in ChromaDB
-    if all_chunks:
+    if unique_chunks:
         repo: HerbRepository = HerbRepository(
             chroma_db_path=str(settings.chroma_db_path),
             collection_name=settings.collection_name,
         )
-        repo.add(all_chunks)
+        repo.add(unique_chunks)
         stats: dict[str, object] = repo.stats()
         logger.info("ingest_stored", stats=stats)
     else:
@@ -133,7 +143,8 @@ def main() -> None:
     elapsed: float = time.monotonic() - start
     logger.info(
         "ingest_pipeline_complete",
-        total_chunks=len(all_chunks),
+        raw_chunks=len(all_chunks),
+        unique_chunks=len(unique_chunks),
         elapsed_seconds=round(elapsed, 1),
     )
 
