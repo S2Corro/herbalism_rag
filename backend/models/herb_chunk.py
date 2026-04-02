@@ -31,7 +31,8 @@ class HerbChunk:
             Format: ``{source_type}-{identifier}-chunk-{index}``.
         text: The actual text excerpt (up to ~512 tokens).
         source_type: Origin database — one of
-            ``"PubMed"``, ``"MSK"``, ``"USDA Duke"``, ``"WHO"``.
+            ``"PubMed"``, ``"MSK"``, ``"USDA Duke"``, ``"WHO"``,
+            ``"NCCIH"``, ``"ClinicalTrials.gov"``.
         title: Document or article title.
         url: Direct link to the source document.
         year: Publication year as a string (some sources lack year data).

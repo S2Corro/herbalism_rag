@@ -19,6 +19,7 @@ import structlog
 from bs4 import BeautifulSoup
 
 from backend.ingest.chunker import chunk_text
+from backend.ingest.herb_list import HERB_SLUGS
 from backend.models.herb_chunk import HerbChunk
 
 logger: structlog.stdlib.BoundLogger = structlog.get_logger()
@@ -28,14 +29,6 @@ _BASE_URL: str = (
     "symptom-management/integrative-medicine/herbs/"
 )
 _RATE_DELAY: float = 1.0  # Be respectful to MSK servers
-
-_DEFAULT_HERBS: list[str] = [
-    "ashwagandha", "turmeric", "ginger", "echinacea", "ginkgo-biloba",
-    "garlic", "valerian", "st-johns-wort", "chamomile", "ginseng",
-    "green-tea", "milk-thistle", "saw-palmetto", "black-cohosh",
-    "evening-primrose", "feverfew", "kava", "licorice-root",
-    "flaxseed", "aloe-vera",
-]
 
 
 class MSKIngestor:
@@ -58,7 +51,7 @@ class MSKIngestor:
         Returns:
             List of ``HerbChunk`` objects with ``source_type="MSK"``.
         """
-        herbs: list[str] = herb_list or _DEFAULT_HERBS
+        herbs: list[str] = herb_list or HERB_SLUGS
         all_chunks: list[HerbChunk] = []
         logger.info("msk_ingest_start", herb_count=len(herbs))
 

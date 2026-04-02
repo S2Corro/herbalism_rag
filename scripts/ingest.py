@@ -11,9 +11,9 @@ Usage::
 
 Execution order:
     1. WHO seed data (always — no network needed)
-    2. PubMed abstracts (requires network)
-    3. MSK About Herbs (requires network)
-    4. USDA Duke CSVs (if files exist)
+    2. PubMed + MSK + NCCIH + ClinicalTrials.gov (async, network)
+    3. USDA Duke CSVs (if files exist)
+    4. Deduplicate → store
 
 Each ingester failure is caught and logged — a single failing source
 does not kill the entire pipeline.
@@ -35,7 +35,10 @@ if str(_PROJECT_ROOT) not in sys.path:
 
 from backend.config import settings  # noqa: E402
 from backend.db.herb_repository import HerbRepository  # noqa: E402
+from backend.ingest.clinical_trials import ClinicalTrialsIngestor  # noqa: E402
+from backend.ingest.herb_list import HERB_NAMES  # noqa: E402
 from backend.ingest.msk_herbs import MSKIngestor  # noqa: E402
+from backend.ingest.nccih import NCCIHIngestor  # noqa: E402
 from backend.ingest.pubmed import PubMedIngestor  # noqa: E402
 from backend.ingest.usda_duke import DukeIngestor  # noqa: E402
 from backend.ingest.who_seeds import WHOSeedIngestor  # noqa: E402
@@ -55,16 +58,11 @@ structlog.configure(
 
 logger: structlog.stdlib.BoundLogger = structlog.get_logger()
 
-_DEFAULT_HERBS: list[str] = [
-    "Ashwagandha", "Turmeric", "Ginger", "Echinacea", "Ginkgo",
-    "Garlic", "Valerian", "St. John's Wort", "Chamomile", "Ginseng",
-]
-
 
 async def _run_async_ingesters(
     all_chunks: list[HerbChunk],
 ) -> None:
-    """Run the async ingesters (PubMed, MSK).
+    """Run the async ingesters (PubMed, MSK, NCCIH, ClinicalTrials.gov).
 
     Args:
         all_chunks: Accumulator list — chunks are appended in place.
@@ -73,7 +71,7 @@ async def _run_async_ingesters(
     try:
         pubmed: PubMedIngestor = PubMedIngestor()
         pubmed_chunks: list[HerbChunk] = await pubmed.run(
-            herb_list=_DEFAULT_HERBS, max_per_herb=3
+            herb_list=HERB_NAMES, max_per_herb=3
         )
         all_chunks.extend(pubmed_chunks)
         logger.info("ingest_pubmed_done", chunks=len(pubmed_chunks))
@@ -88,6 +86,26 @@ async def _run_async_ingesters(
         logger.info("ingest_msk_done", chunks=len(msk_chunks))
     except Exception as exc:
         logger.error("ingest_msk_failed", error=str(exc))
+
+    # NCCIH
+    try:
+        nccih: NCCIHIngestor = NCCIHIngestor()
+        nccih_chunks: list[HerbChunk] = await nccih.run(herb_list=HERB_NAMES)
+        all_chunks.extend(nccih_chunks)
+        logger.info("ingest_nccih_done", chunks=len(nccih_chunks))
+    except Exception as exc:
+        logger.error("ingest_nccih_failed", error=str(exc))
+
+    # ClinicalTrials.gov
+    try:
+        ctgov: ClinicalTrialsIngestor = ClinicalTrialsIngestor()
+        ctgov_chunks: list[HerbChunk] = await ctgov.run(
+            herb_list=HERB_NAMES, max_per_herb=5
+        )
+        all_chunks.extend(ctgov_chunks)
+        logger.info("ingest_ctgov_done", chunks=len(ctgov_chunks))
+    except Exception as exc:
+        logger.error("ingest_ctgov_failed", error=str(exc))
 
 
 def main() -> None:
@@ -106,10 +124,10 @@ def main() -> None:
     except Exception as exc:
         logger.error("ingest_who_failed", error=str(exc))
 
-    # 2 & 3. PubMed + MSK (async)
+    # 2. PubMed + MSK + NCCIH + ClinicalTrials.gov (async)
     asyncio.run(_run_async_ingesters(all_chunks))
 
-    # 4. USDA Duke (sync, if CSVs exist)
+    # 3. USDA Duke (sync, if CSVs exist)
     try:
         duke: DukeIngestor = DukeIngestor()
         duke_chunks: list[HerbChunk] = duke.run()
