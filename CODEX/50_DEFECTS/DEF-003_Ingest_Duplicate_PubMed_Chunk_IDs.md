@@ -2,12 +2,12 @@
 id: DEF-003
 title: "Ingestion pipeline crashes with ChromaDB DuplicateIDError on repeated PubMed PMIDs"
 type: reference
-status: OPEN
+status: VERIFIED
 owner: architect
 agents: [coder]
 tags: [defect, ingestion, pubmed, chromadb]
-related: [SPR-003, SPR-007]
-created: 2026-04-02
+related: [SPR-003, SPR-007]t
+created: 2026-04-02t
 updated: 2026-04-02
 version: 1.0.0
 ---
@@ -22,7 +22,7 @@ version: 1.0.0
 |:------|:------|
 | **Priority** | P1 |
 | **Severity** | 2-BLOCKING |
-| **Status** | OPEN |
+| **Status** | VERIFIED |
 | **Discovered By** | Human operator (during SPR-007 T-002) |
 | **Discovered During** | First live run of `scripts/ingest.py` |
 | **Component** | `scripts/ingest.py` — ingestion orchestrator |
@@ -58,7 +58,7 @@ The orchestrator (`scripts/ingest.py`) queries PubMed once per herb in `_DEFAULT
 
 `all_chunks` accumulates one `HerbChunk` per occurrence. When the orchestrator calls `repo.add(all_chunks)`, ChromaDB's `upsert` receives the same ID multiple times **within a single batch call** — which it explicitly rejects. (ChromaDB *tolerates* the same ID across separate `upsert` calls but not within one.)
 
-The fix is to deduplicate `all_chunks` by `chunk.id` before the `repo.add()` call. The first occurrence is kept; later duplicates (same article, different herb query) are discarded.
+The fix is to deduplicate `all_chunks` by `chunk.id` before the `repo.add()` call. When duplicates exist, the **last** occurrence is kept (dict comprehension semantics). This is functionally equivalent to first-wins because identical PMIDs produce identical content — the herb query that triggered the hit differs, but the article text is the same.
 
 ## 4. Evidence
 

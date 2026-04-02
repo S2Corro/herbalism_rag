@@ -380,7 +380,7 @@ documents:
     path: 50_DEFECTS/DEF-003_Ingest_Duplicate_PubMed_Chunk_IDs.md
     title: "Ingestion pipeline crashes with ChromaDB DuplicateIDError on repeated PubMed PMIDs"
     type: reference
-    status: OPEN
+    status: VERIFIED
     tags: [defect, ingestion, pubmed, chromadb]
     agents: [coder]
     summary: >
